@@ -2,68 +2,76 @@
 # -*- coding: utf-8 -*-
 
 """
-EQ ORGANIZATION: https://www.lucidchart.com/documents/edit/c15a7865-f309-4d48-947f-f7b00ac05159/0
-
-https://academic.oup.com/brain/article/137/8/2210/2847958#78872443
-
+DB DIAGRAM - https://www.lucidchart.com/documents/edit/9275d4dc-d1fb-4327-88f0-46c68caceecd/0
 
 https://pydstool.github.io/PyDSTool/FrontPage.html - similar, take ideas from 
     http://csc.ucdavis.edu/~chaos/courses/nlp/Projects2008/Engle_Whalen/englewhalen_report.pdf also 
+    https://github.com/artemyk/dynpy
     https://github.com/simupy/simupy too - block diagrams
         matlab - https://www.mathworks.com/help/simulink/simulink.html
-integrate XPP too? http://www.math.pitt.edu/%7Ebard/bardware/tut/newstyle.html
+integratable w XPP too? http://www.math.pitt.edu/%7Ebard/bardware/tut/newstyle.html
     should be able to just put in raw EQ file http://www.math.pitt.edu/%7Ebard/bardware/tut/start.html#toc
+
 @TODOs
-    DS HVs w/ Nullclines
+    "assemblage" option for parameters? - different systems can have different vals for multi-agent ensembles    
+    Initial Conditions count as special params
     Serializable - intention for DB
-    Able to run as Stream?
+        all computed runs should be reduceable to & re-obtainable from System obj (Components aggregated via Equations) & Parameter Values
+    Able to run data as stream? 
+        options of loop/stop/steptime
+        Param sliders update result of fn in real(ish) time
     inputtable as template string
         QT frontend for inputting block diagram - NodeFlow
-    Flowchart of components
+    can output a NF flowchart of components
+    fortran computational backend? - https://arogozhnikov.github.io/2015/11/29/using-fortran-from-python.html
+    upload to pypi - https://packaging.python.org/tutorials/packaging-projects/
+    Latex formatting
+    Optional Accounting for Units?
+    On Iterate: - PARALLELIZE
+        >Transmit from all sources (stateful Systems,Params (& Constants?)) 
+        >>Process functions 
+            Transmit from fns?
+        >>>all Systems Receive, calculate new State.
+        >>>>Events read Transmissions? or before Systems?
 """
 import numpy as np
-class System(object):#A System is at least one Node with some metadata
+class DynamicalSystem(object):#Master Object - everything User controls goes here, everything packaged up ready to use - connects Ensemble
     pass
-class Nodes(object):#Nodes are a collection of Components fit into a specific connectivity all associated with an integrator. Coupling Input & Output can be defined for this Node ()
+class State(object):#would this be useful? saved db result?
+    pass  
+class Ensemble(object):#An ensemble is a list of one or more Systems (each of which potentially have different Parameters set) a Topology Adj Mat (default I) 
+    pass
+class System(object):#Sysetms are a collection of Components fit into a specific connectivity. Coupling Input & Output can be defined for this System ()
     def __init__(self,eqdict):
         pass
-class Component(object):#stateful component of dynamic Node 
+    def defineCoupling(self,coupledir):#coupling: dict of Component -> Parameter/Slot (how it fits into Equation)
+        pass
+    
+class Component(object):#stateful component of dynamic System 
+    pass
+class Function(object):#Objects with No state, gets computed & immediately sent along 
+    def __init__(self,fn):
+        self.fn=fn
+class Parameter(object): 
     pass
 
-class Parameter(object):
+class Constant(object):
+    def __init__(self,name,value):
+        self.name=name
+        self.value=value
+
+class Variable(object):#account for derivatives somehow
     pass
 
-class Variable(object):
+class Equation(object):#how parameters & Variables connect within a system - Differential EQ child of EQ? 
     pass
-
-class Equation(object):
+class Slot(object):#generic name for object connected to an "outside" - can be coupled with, can be manipulated
     pass
-
 class Integrator(object):
     pass
 
-
-def eulerintegrator(function,initialDomain,finalDomain,initialRange,numSteps=None,maxStepSize=None):#returns finalRange estimate by stepping through - uses 2/3 of finalDomain,numSteps,maxStepSize to figure out the other third
-#    
-#    if finalDomain is not None:#either numsteps xor maxstepsize should be defined
-#        []
-    if numSteps is not None:
-        maxStepSize=(finalDomain-initialDomain)/numSteps
-    elif maxStepSize is not None:
-        numSteps=round((finalDomain-initialDomain)/maxStepSize)
-    else:#both are None
-        return None
-    rangeArray=np.zeros(numSteps+1)
+class Event(object):#basic logic - emits when logic returns true, called whenever attribute attached to runs 
+    def __init__(self,conditional,slot):
+        pass
     
-    rangeArray[0]=initialRange
-    thisDomain=initialDomain
-    for s in range(numSteps):
-        rangeArray[s+1]=rangeArray[s]+maxStepSize*function(thisDomain,rangeArray[s])
-        thisDomain=thisDomain+maxStepSize
-    return rangeArray
-def eulerstep():
-    pass
-    
-def rkintegrator(): #RK4
-    pass
 
