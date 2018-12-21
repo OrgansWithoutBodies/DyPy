@@ -3,11 +3,14 @@
 """
 Created on Thu Dec 20 00:27:01 2018
 
-@author: v
+@TODOs:
+    Parallelize
+    RK
+    qq  
 """
 
 
-def eulerintegrator(function,initialDomain,finalDomain,initialRange,numSteps=None,maxStepSize=None):#returns finalRange estimate by stepping through - uses 2/3 of finalDomain,numSteps,maxStepSize to figure out the other third
+def euler(function,initialDomain,finalDomain,initialRange,numSteps=None,maxStepSize=None):#returns finalRange estimate by stepping through - uses 2/3 of finalDomain,numSteps,maxStepSize to figure out the other third
 #    
 #    if finalDomain is not None:#either numsteps xor maxstepsize should be defined
 #        []
@@ -28,6 +31,11 @@ def eulerintegrator(function,initialDomain,finalDomain,initialRange,numSteps=Non
 def eulerstep():
     pass
     
-def rkintegrator(): #RK4
+
+
+def rk(): #RK4
+    pass
+
+def rkstep():
     pass
 
