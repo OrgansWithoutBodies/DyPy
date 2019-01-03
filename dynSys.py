@@ -29,6 +29,7 @@ integratable w XPP too? http://www.math.pitt.edu/%7Ebard/bardware/tut/newstyle.h
     Latex formatting
     read object values from json file
     Optional Accounting for Units?
+    Switchable Topology?
     On Iterate: - PARALLELIZE
         >Transmit from all sources (stateful Systems,Params (& Constants?)) 
         >>Process functions 
@@ -44,7 +45,10 @@ from dynComp import *
 from dynViz import *
 import DPIO as IO
 
-
+METHODS={'central':lambda f,a,h:((f(a+h)-f(a-h))/(2*h)),
+         'forward':lambda f,a,h:((f(a+h)-f(a))/h),
+         'backward':lambda f,a,h:((f(a)-f(a-h))/h)}
+        
 class Simulation(object):#Master Object - everything User controls goes here, everything packaged up ready to use - connects Ensemble to Integrator, outputs a bunch of States
     pass
 class Ensemble(object):#An ensemble is a list of one or more Systems (each of which potentially have different Parameters set) a Topology Adj Mat (default I) 
@@ -61,14 +65,21 @@ class System(object):#Sysetms are a collection of Components fit into a specific
 
 class Equation(object):#how parameters & Variables connect within a system - Differential EQ child of EQ? 
     def __init__(self,template):
-        pass
-    def Diff(self,wrt,order=1):#wrt is dependant variable, order is how many times to differentiate
-        pass
+        self.template=template
     
 #component & function subclasses of Equation?
 class Component(Equation):#stateful component of dynamic System  - Differential Equation: composed of set w Variable & definition of its derivative(s) 
     def __init__(self,var,dvars,memorySize=1,*args,**kw):#memorysize -how many steps back each step of the component has access to (-1 -> All steps)   
         pass
+    def Diff(self,rng,wrt='t',order=1,method='forward',stepsize=0.01):#wrt is dependant variable, order is how many times to differentiate
+        if method not in METHODS.keys():
+            return None#error, please use one of the following methods: 
+        METHODS[method](f=self.template,a=rng,h=stepsize)
+        
+#            central: f(a+h) - f(a-h))/2h
+#            forward: f(a+h) - f(a))/h
+#            backward: f(a) - f(a-h))/h            
+
 class Function(Equation):#EQ with No state, gets computed & immediately sent along 
     def __init__(self,fn,*args,**kw):
         self.fn=fn
@@ -119,10 +130,6 @@ class Integrator(object):
         for n in range(len(self.rangeArray)-1):
            thisDomain,self.rangeArray[n+1]=self.stepMethod(function=self.function,thisDomain=thisDomain,thisRange=self.rangeArray[n],maxStepSize=self.maxStepSize)
         return self.rangeArray
-#class EulerIntegrator(Integrator):
-#    pass
-#class RKIntegrator(Integrator):#RK4
-#    pass
 #########################
 
 class Event(object):#basic logic - emits when logic returns true, called whenever attribute attached to runs 
