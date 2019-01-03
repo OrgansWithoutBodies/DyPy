@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-THIS FILE: Object definitions linking things together
+THIS FILE: Object definitions linking things together - ONLY FILE MEANT TO BE DIRECTLY INTERFACED WITH
+
 DB DIAGRAM - https://www.lucidchart.com/documents/edit/9275d4dc-d1fb-4327-88f0-46c68caceecd/0
 
 https://pydstool.github.io/PyDSTool/FrontPage.html - similar, take ideas from 
@@ -40,24 +41,33 @@ integratable w XPP too? http://www.math.pitt.edu/%7Ebard/bardware/tut/newstyle.h
 import numpy as np
 
 from dynComp import *
-class Simulation(object):#Master Object - everything User controls goes here, everything packaged up ready to use - connects Ensemble
+from dynViz import *
+import DPIO as IO
+
+
+class Simulation(object):#Master Object - everything User controls goes here, everything packaged up ready to use - connects Ensemble to Integrator, outputs a bunch of States
     pass
 class Ensemble(object):#An ensemble is a list of one or more Systems (each of which potentially have different Parameters set) a Topology Adj Mat (default I) 
-    def __init__(self,systems,topmat,*args,**kw):
+    def __init__(self,systemList,topMat=np.array((1)),defaultConnStrength=1,*args,**kw):
         pass
 class System(object):#Sysetms are a collection of Components fit into a specific connectivity. Coupling Input & Output can be defined for this System ()
-    def __init__(self,eqdict,*args,**kw):
+    def __init__(self,eqDict,*args,**kw):
         pass
-    def defineCoupling(self,coupledir):#coupling: dict of Component -> Parameter/Slot (how it fits into Equation)
+    def defineCoupling(self,coupleDir):#coupling: dict of Component -> Parameter/Slot (how it fits into Equation)
+        pass
+    def changeParameters(self):#meant to be used for an Ensemble with non-homogenous Parameters 
         pass
 #########################
 
 class Equation(object):#how parameters & Variables connect within a system - Differential EQ child of EQ? 
     def __init__(self,template):
         pass
+    def Diff(self,wrt,order=1):#wrt is dependant variable, order is how many times to differentiate
+        pass
+    
 #component & function subclasses of Equation?
 class Component(Equation):#stateful component of dynamic System  - Differential Equation: composed of set w Variable & definition of its derivative(s) 
-    def __init__(self,var,dvars,memorysize=1,*args,**kw):#memorysize -how many steps back each step of the component has access to (-1 -> All steps)   
+    def __init__(self,var,dvars,memorySize=1,*args,**kw):#memorysize -how many steps back each step of the component has access to (-1 -> All steps)   
         pass
 class Function(Equation):#EQ with No state, gets computed & immediately sent along 
     def __init__(self,fn,*args,**kw):
@@ -99,7 +109,7 @@ class Integrator(object):
         self.rangeArray=rangeArray
         self.function=function
         self.initialDomain=initialDomain
-        if stepMethod in {eulerstep,rkstep}:
+        if stepMethod in STEPMETHODS:
             self.stepMethod=stepMethod
         else:
             return None

@@ -29,3 +29,6 @@ def rkstep(function,thisDomain,thisRange,maxStepSize,RKdepth=4):
     nextDomain=thisDomain+maxStepSize
     
     return nextDomain,nextRange
+
+
+STEPMETHODS={eulerstep,rkstep}
