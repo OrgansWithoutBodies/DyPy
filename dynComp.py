@@ -1,41 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Dec 20 00:27:01 2018
 
 @TODOs:
     Parallelize
-    RK
-    qq  
+    Fix RK scaling
+    different RK depths
+    integrators can do little bits at a time (saved in state instead & offered break location as specific ICs?)
+    
 """
-
-
-def euler(function,initialDomain,finalDomain,initialRange,numSteps=None,maxStepSize=None):#returns finalRange estimate by stepping through - uses 2/3 of finalDomain,numSteps,maxStepSize to figure out the other third
-#    
-#    if finalDomain is not None:#either numsteps xor maxstepsize should be defined
-#        []
-    if numSteps is not None:
-        maxStepSize=(finalDomain-initialDomain)/numSteps
-    elif maxStepSize is not None:
-        numSteps=round((finalDomain-initialDomain)/maxStepSize)
-    else:#both are None
-        return None
-    rangeArray=np.zeros(numSteps+1)
+import numpy as np
+####
+def eulerstep(function,thisDomain,thisRange,maxStepSize):
     
-    rangeArray[0]=initialRange
-    thisDomain=initialDomain
-    for s in range(numSteps):
-        rangeArray[s+1]=rangeArray[s]+maxStepSize*function(thisDomain,rangeArray[s])
-        thisDomain=thisDomain+maxStepSize
-    return rangeArray
-def eulerstep():
-    pass
+     nextRange=thisRange+maxStepSize*function(domain=thisDomain,range=thisRange)
+     nextDomain=thisDomain+maxStepSize
     
+     return nextDomain,nextRange
 
 
-def rk(): #RK4
-    pass
-
-def rkstep():
-    pass
-
+def rkstep(function,thisDomain,thisRange,maxStepSize,RKdepth=4):
+    k1=maxStepSize*function(domain=thisDomain,range=thisRange)
+    k2=maxStepSize*function(domain=thisDomain+maxStepSize/2,range=thisRange+k1/2)
+    k3=maxStepSize*function(domain=thisDomain+maxStepSize/2,range=thisRange+k2/2)
+    k4=maxStepSize*function(domain=thisDomain+maxStepSize,range=thisRange+k3)
+    
+    nextRange=thisRange+1/6*(k1+2*k2+2*k3+k4) 
+    nextDomain=thisDomain+maxStepSize
+    
+    return nextDomain,nextRange
